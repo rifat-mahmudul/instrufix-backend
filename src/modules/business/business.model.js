@@ -1,18 +1,10 @@
-const { Schema, model, default: mongoose } = require("mongoose");
+const { Schema, model, default: mongoose } = require('mongoose');
 
 const businessHoursSchema = new Schema(
   {
     day: {
       type: String,
-      enum: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
+      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     },
     startTime: { type: String },
     startMeridiem: { type: String },
@@ -28,8 +20,8 @@ const serviceSchema = new Schema(
     newInstrumentName: { type: String, required: true },
     pricingType: {
       type: String,
-      enum: ["exact", "range", "hourly"],
-      required: true,
+      enum: ['exact', 'range', 'hourly'],
+      // required: true,
     },
     price: { type: Number, default: 0 },
     minPrice: { type: Number, default: 0 },
@@ -45,8 +37,8 @@ const musicLessonSchema = new Schema(
     newInstrumentName: { type: String, required: true },
     pricingType: {
       type: String,
-      enum: ["exact", "range", "hourly"],
-      required: true,
+      enum: ['exact', 'range', 'hourly'],
+      // required: true,
     },
     price: { type: Number, default: 0 },
     minPrice: { type: Number, default: 0 },
@@ -58,7 +50,7 @@ const musicLessonSchema = new Schema(
 
 const businessSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
     // adminId: { type: Schema.Types.ObjectId, ref: "User" },
     businessInfo: {
       name: { type: String, required: true },
@@ -84,21 +76,21 @@ const businessSchema = new Schema(
     tradeInstruments: { type: Boolean, default: false },
     rentInstruments: { type: Boolean, default: false },
     isMusicLessons: { type: Boolean, default: false },
-    review: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
+    review: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
     reviewImage: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Picture",
+        ref: 'Picture',
       },
     ],
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
     },
     type: {
       type: String,
-      enum: ["myBusiness", "addABusiness"],
+      enum: ['myBusiness', 'addABusiness'],
     },
     longitude: { type: Number },
     latitude: { type: Number },
@@ -117,5 +109,5 @@ const businessSchema = new Schema(
   },
 );
 
-const Business = model("Business", businessSchema);
+const Business = model('Business', businessSchema);
 module.exports = Business;
