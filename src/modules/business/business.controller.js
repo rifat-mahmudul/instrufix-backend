@@ -1256,7 +1256,12 @@ exports.toggleBusinessStatus = async (req, res) => {
     business.status = status;
     await business.save();
 
-    const owner = business.userId;
+    const ownerEmail = business.email || business.businessInfo?.email;
+    const owner = business.userId
+      ? await User.findById(business.userId)
+      : ownerEmail
+        ? await User.findOne({ email: ownerEmail })
+        : null;
     if (owner) {
       const alreadyNotified = await Notification.findOne({
         receiverId: owner._id,
@@ -1265,11 +1270,12 @@ exports.toggleBusinessStatus = async (req, res) => {
       });
 
       if (!alreadyNotified) {
+        const io = req.app.get('io');
         // ---------- Create Notification ----------
-        await Notification.create({
+        const notify = await Notification.create({
           senderId: null, // system/admin
           receiverId: owner._id,
-          userType: business.user ? 'user' : 'admin',
+          userType: owner.userType || 'user',
           type: `business_${status}`,
           title: status === 'approved' ? 'Business Approved' : 'Business Rejected',
           message:
@@ -1281,6 +1287,8 @@ exports.toggleBusinessStatus = async (req, res) => {
             status,
           },
         });
+
+        io.to(`${owner._id}`).emit('new_notification', notify);
       }
     }
 

@@ -10,7 +10,10 @@ exports.getNotifications = async (req, res) => {
     }
     let notify;
     if (userType === "admin") {
-      notify = await Notification.find({ isIgnored: false }).sort({
+      notify = await Notification.find({
+        isIgnored: false,
+        $or: [{ receiverId: userId }, { userType: "admin" }],
+      }).sort({
         createdAt: -1,
       });
     } else {
@@ -41,13 +44,18 @@ exports.getAllNotifications = async (req, res) => {
     }
     let notify;
     if (userType === "admin") {
-      notify = await Notification.find({ isRead: false }).sort({
+      notify = await Notification.find({
+        isRead: false,
+        isIgnored: false,
+        $or: [{ receiverId: userId }, { userType: "admin" }],
+      }).sort({
         createdAt: -1,
       });
     } else {
       notify = await Notification.find({
         receiverId: userId,
         isRead: false,
+        isIgnored: false,
       }).sort({
         createdAt: -1,
       });
@@ -112,8 +120,8 @@ exports.markAsAllRead = async (req, res) => {
   try {
     const { userId } = req.user;
     const result = await Notification.updateMany(
-      { receiverId: userId },
-      { isRead: true },
+      { receiverId: userId, isRead: false },
+      { $set: { isRead: true } },
     );
 
     return res.status(200).json({
@@ -130,7 +138,7 @@ exports.markAsAllRead = async (req, res) => {
 
 exports.markAsAllReadForAdmin = async (req, res) => {
   try {
-    const { userType } = req.user;
+    const { userId, userType } = req.user;
 
     // 🔐 Only admin allowed
     if (userType !== "admin") {
@@ -142,7 +150,11 @@ exports.markAsAllReadForAdmin = async (req, res) => {
 
     // ✅ Only unread notifications update
     const result = await Notification.updateMany(
-      { isRead: false },
+      {
+        isRead: false,
+        isIgnored: false,
+        $or: [{ receiverId: userId }, { userType: "admin" }],
+      },
       { $set: { isRead: true } },
     );
 
