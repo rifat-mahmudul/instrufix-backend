@@ -59,7 +59,7 @@ router.put(
 
 router.delete(
   "/delete-account/:userId",
-  // auth(USER_ROLE.businessMan, USER_ROLE.user, USER_ROLE.admin),
+  auth(USER_ROLE.admin),
   userController.deletedUserAccount
 );
 

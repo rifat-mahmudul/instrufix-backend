@@ -210,7 +210,7 @@ const resendOtpCode = async ({ email }) => {
 };
 
 const getAllUsersFromDb = async ({ userType, sortBy, time }) => {
-  const filter = { isVerified: true };
+  const filter = { isVerified: true, isDelete: { $ne: true } };
 
   if (userType && ["user", "businessOwner", "businessMan"].includes(userType)) {
     filter.userType = userType;
@@ -345,17 +345,22 @@ const deletedUserAccount = async (userId) => {
     }
   }
 
-  await User.findByIdAndUpdate(
+  const deletedUser = await User.findByIdAndUpdate(
     userId,
     {
       $set: {
-        isDeleted: true,
+        isDelete: true,
+        isActive: false,
       },
     },
     {
       new: true,
     },
   );
+
+  if (!deletedUser) throw new Error("User delete failed");
+
+  return deletedUser;
 };
 
 const addSupport = async (payload) => {
