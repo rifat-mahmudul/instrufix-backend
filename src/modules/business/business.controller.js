@@ -1409,8 +1409,11 @@ exports.updateBusiness = async (req, res) => {
       );
     }
 
-    // Prepare update payload
+    // Profile edits should not change approval/verification state.
+    // Approval changes are handled by the dedicated admin status endpoint.
     const updatePayload = { ...req.body };
+    delete updatePayload.status;
+    delete updatePayload.isVerified;
 
     // Append new images to existing ones instead of replacing
     if (image.length > 0) {
